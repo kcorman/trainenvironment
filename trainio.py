@@ -135,10 +135,12 @@ class TrainIo():
             self.write_output_pin_state(i, PIN_OFF)
         time.sleep(1)
         # Go through the lower 8 pins and turn them on
+        print("Loop through output pins 0 through 8 turning them on")
         for i in range(8):
             self.write_output_pin_state(i, PIN_ON)
             time.sleep(.5)
             
+        print("Loop through output pins 0 through 8 turning them off")
         # Go through the lower 8 pins and turn them off
         for i in range(8):
             self.write_output_pin_state(i, PIN_OFF)
@@ -146,15 +148,18 @@ class TrainIo():
             
         time.sleep(2)
         # Go through the virtual sound channels and play them
+        print("Loop through output sound channels 0 through 8")
         for i in range(8):
             self.play_sound("test", i)
             time.sleep(1)
         time.sleep(1)
+        print("Play no-channel sound")
         self.play_sound("test", None)
         time.sleep(1)
 
         time.sleep(2)
         # Read the first 8 inputs and pipe the result into the output pins
+        print("Loop through inputs 0 through 8 and pipe result into output pins 0 through 8")
         for i in range(8):
             val = self.read_input_pin_state(i)
             self.write_output_pin_state(i, val)
@@ -170,6 +175,7 @@ class TrainIo():
             self.write_output_pin_state(0, PIN_OFF)
             self.write_output_pin_state(7, PIN_OFF)
             time.sleep(.25)
+        print("Testing done")
 
 def main():
     func_type = sys.argv[1]
