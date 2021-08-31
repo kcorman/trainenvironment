@@ -2,8 +2,8 @@ from playsound import playsound
 
 PIN_ON = 1
 PIN_OFF = 0
-SOUND_CLICKING="click.m4a"
-SOUND_SSSH="sss.m4a"
+SOUND_CLICKING="/home/pi/trainenvironment/sounds/click.m4a"
+SOUND_SSSH="/home/pi/trainenvironment/sounds/sss.m4a"
 
 
 class TrainIo():

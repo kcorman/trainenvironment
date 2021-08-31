@@ -1,5 +1,6 @@
 import time
 import heapq
+import logging
 import trainio
 
 TICK_TIME = 0.1
@@ -8,6 +9,8 @@ POSSUM_RELAY_PIN = 0
 RABBIT_RELAY_PIN = 1
 POSSUM_TRIGGER_PIN = 0
 RABBIT_TRIGGER_PIN = 1
+
+logging.basicConfig(filename='app.log', filemode='w', level=logging.DEBUG)
 
 class Event:
     def __init__(self, next_trigger_time, action):
@@ -49,7 +52,7 @@ class WorldState:
         self.io.write_output_pin_state(pin, state)
 
     def scan_inputs(self):
-        # todo - scan all inputs
+        logging.debug("World state scanning all inputs")
         updated_pins = []
         for pin in self.io.get_all_input_pins():
             new_state = self.io.read_input_pin_state(pin)
@@ -155,6 +158,7 @@ def setRabbitPin(state):
     io._debug_write_input_pin_state(RABBIT_TRIGGER_PIN, state)
 
 def main():
+    logging.debug("Starting main")
     eq = EventQueue()
     ws = WorldState(eq, io)
     #trig = TimedRelayTrigger("possum", ws, 3.5, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 5)
@@ -171,14 +175,16 @@ def main():
     eq.push(Event(time.time() + 15, lambda : setRabbitPin(trainio.PIN_OFF)))
 
     eq.push(Event(time.time() + 14, lambda : setPinState(trainio.PIN_ON)))
-
+    total_ticks=0
     while(True):
-        print("tick")
+        logging.debug("Running tick " + str(total_ticks))
+        total_ticks+=1
         time.sleep(TICK_TIME)
         ws.scan_inputs()
         next_event = eq.peek()
         while(next_event and next_event.next_trigger_time <= time.time()):
             eq.pop()
+            logging.debug("Popped an action")
             next_event.action()
             next_event = eq.peek()
 
