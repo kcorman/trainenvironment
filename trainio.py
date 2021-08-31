@@ -153,3 +153,30 @@ class TrainIo():
     def print_state(self):
         print("virtualPins:" + bin(self.virtual_output_pin_state))
         print("virtual_channel:" + self.virtual_sound_channel)
+
+def main():
+    func_type = sys.argv[1]
+    if(func_type == "main_test"):
+        print("Performing main test")
+        v = TrainIo()
+        v.performTest()
+        print("Testing complete)
+    elif(func_type == "output_test"):
+        output_pin_index = int(sys.argv[1])
+        assert output_pin_index >= 0 and output_pin_index <= NUM_BITS
+        v = TrainIo()
+        v.write_output_pin_state(output_pin_index, PIN_OFF)
+        time.sleep(.5)
+        v.write_output_pin_state(output_pin_index, PIN_ON)
+        time.sleep(2)
+        v.write_output_pin_state(output_pin_index, PIN_OFF)
+    elif(func_type == "input_test"):
+        input_pin_index = int(sys.argv[1])
+        assert input_pin_index >= 0 and input_pin_index <= NUM_MULTI_INPUT_PINS
+        v = TrainIo()
+        val = v.read_input_pin_state(input_pin_index)
+        print("read value: " + str(val) + " from input pin " + str(input_pin_index))
+
+
+if __name__ == "__main__":
+    main()
