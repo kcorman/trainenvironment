@@ -1,8 +1,5 @@
-# Defines the main sound handling logic
-# this is loosely coupled to the gpio handling class because it
-# also needs to set "virtual sound channels" appropriately
-# The core idea is that the caller can play a sound on a virtual channel by name
-# the caller can also stop sounds by name
+# Defines a Sound that rotates through multiple files
+# these files are mutually exclusive. If a sound is in progress and play is called again, nothing will happen
 from os import listdir
 from os.path import isfile, join
 import time
@@ -10,7 +7,6 @@ import logging
 import random
 import simple_sound_lib
 
-logging.basicConfig(level=logging.DEBUG)
 class Sound:
     def __init__(self, dirname):
         # name of directory that the sounds reside in
@@ -51,14 +47,13 @@ class Sound:
         if(self.curr_sound_handle != None):
             simple_sound_lib.stop_sound(self.curr_sound_handle)
 
-snd = Sound("./sounds/tmp/")
-while(True):
-    snd.play_next_sound()
-    itr=0
-    while(snd.is_playing()):
-        print("sound still playing, waiting...")
-        time.sleep(1)
-        itr+=1
-        if(itr > 6):
-            snd.stop_current_sound()
-    print("sound done")
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    # test out sounds in tmp
+    snd = Sound("./sounds/tmp/")
+    while(True):
+        snd.play_next_sound()
+        while(snd.is_playing()):
+            print("sound still playing, waiting...")
+            time.sleep(1)
+        print("sound done")
