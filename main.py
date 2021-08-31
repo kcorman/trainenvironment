@@ -146,7 +146,7 @@ class WigWagRelayTrigger(Trigger):
         self.end_at = time.time() + self.duration
         self.reschedule()
 
-io = trainio.FakeIo()
+io = trainio.TrainIo()
 
 def setPinState(state):
     print("Set possum pin state: " + str(state))
