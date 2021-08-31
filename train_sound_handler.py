@@ -7,10 +7,11 @@ import time
 import logging
 from trainsound import Sound
 
+# logging.basicConfig(level=logging.DEBUG)
 # Globally define the sound names to Sound object mappings
 ALL_SOUNDS = {
-    "tmp1": Sound("tmp1"),
-    "tmp2": Sound("tmp2")
+    "tmp1": Sound("sounds/tmp1"),
+    "tmp2": Sound("sounds/tmp2")
 }
 
 class SoundHandler():
@@ -42,6 +43,7 @@ class SoundHandler():
                 if(len(active_channel_list) == 0):
                     # means we did have elements but now we don't
                     self.virtual_sound_channel_mgr.disable_virtual_channel(i)
+                    logging.debug("Disabling virtual sound channel " + str(i) + " because all sounds completed on it")
                 else:
                     res.append(i)
         return res
@@ -50,14 +52,14 @@ class SoundHandler():
     def play_sound(self, name, virtual_channel):
         active_channels=self.cleanup_channels()
         if(not name in ALL_SOUNDS):
-            logging.warn("Asked to play sound that doesn't exist in known sounds: " + name)
+            logging.warning("Asked to play sound that doesn't exist in known sounds: " + name)
             return
         sound = ALL_SOUNDS[name]
         if(virtual_channel == None):
             sound.play_next_sound()
         else:
             if(len(active_channels) > 0):
-                logging.warn("Playing sound on channel " + str(virtual_channel) + " but found sounds already in progress on channels " + str(active_channels))
+                logging.warning("Playing sound on channel " + str(virtual_channel) + " but found sounds already in progress on channels " + str(active_channels))
             self.virtual_sound_channel_mgr.enable_virtual_channel(virtual_channel)
             sound.play_next_sound()
             logging.debug("adding sound " + name + " to active virtual channel " + str(virtual_channel))
@@ -74,24 +76,22 @@ if __name__ == "__main__":
         def num_channels(self):
             return 8
 
-    logging.basicConfig(level=logging.DEBUG)
     # test out sounds in tmp
     handler = SoundHandler(ChannelMgr())
-    while(True):
-        logging.debug("Play sound tmp1 on channel 3")
-        handler.play_sound(tmp1, 3)
-        time.sleep(10)
-        logging.debug("Play sound tmp1 on channel 3")
-        handler.play_sound(tmp1, 3)
-        time.sleep(2)
-        logging.debug("Play sound tmp2 on channel 5")
-        handler.play_sound(tmp2, 5)
-        time.sleep(10)
-        logging.debug("Play sound tmp2 on channel 5")
-        handler.play_sound(tmp2, 1)
-        time.sleep(10)
-        logging.debug("Play sound tmp2 on no channel")
-        handler.play_sound(tmp2, None)
-        time.sleep(10)
-        logging.debug("done")
+    #logging.debug("Play sound tmp1 on channel 3")
+    #handler.play_sound("tmp1", 3)
+    #time.sleep(13)
+    #logging.debug("Play sound tmp1 on channel 3")
+    #handler.play_sound("tmp1", 3)
+    #time.sleep(2)
+    #logging.debug("Play sound tmp2 on channel 5")
+    #handler.play_sound("tmp2", 5)
+    #time.sleep(20)
+    #logging.debug("Play sound tmp2 on channel 5")
+    #handler.play_sound("tmp2", 1)
+    #time.sleep(10)
+    logging.debug("Play sound tmp2 on no channel")
+    handler.play_sound("tmp2", None)
+    time.sleep(10)
+    logging.debug("done")
 
