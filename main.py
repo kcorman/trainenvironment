@@ -71,14 +71,15 @@ class WorldState:
         self.input_change_subscribers[pin_index].append(subscriber)
         
 class Trigger:
-    def __init__(self, name, worldstate, cooldown_duration, trigger_pin, sound):
+    def __init__(self, name, worldstate, cooldown_duration, trigger_pin, sound_name, sound_channel):
         self.worldstate = worldstate
         self.name = name
         self.on = False
         self.cooldown_duration = cooldown_duration
         self.cooloff = time.time()
         self.trigger_pin = trigger_pin
-        self.sound = sound
+        self.sound_name = sound_name
+        self.sound_channel = sound_channel
         self.subscribe_to_pin_state(trigger_pin)
     
     def fire_trigger(self):
@@ -86,7 +87,8 @@ class Trigger:
             self.on = True
             self.trigger_impl()
             self.cooloff = time.time() + self.cooldown_duration
-            self.worldstate.io.play_sound(self.sound)
+            if(sound_name != None):
+                self.worldstate.io.play_sound(self.sound_name, self.sound_channel)
     
     def trigger_impl(self):
         pass
@@ -146,40 +148,22 @@ class WigWagRelayTrigger(Trigger):
         self.end_at = time.time() + self.duration
         self.reschedule()
 
-io = trainio.TrainIo()
-
-def setPinState(state):
-    print("Set possum pin state: " + str(state))
-    io._debug_write_input_pin_state(POSSUM_TRIGGER_PIN, state)
-
-
-def setRabbitPin(state):
-    print("Set rabbit state: " + str(state))
-    io._debug_write_input_pin_state(RABBIT_TRIGGER_PIN, state)
-
 def main():
-    logging.debug("Starting main")
+    logging.info("Starting main")
+    io = trainio.TrainIo()
     eq = EventQueue()
     ws = WorldState(eq, io)
     #trig = TimedRelayTrigger("possum", ws, 3.5, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 5)
-    trig = WigWagRelayTrigger("possum", ws, 6, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 10, 1, .3, trainio.SOUND_CLICKING)
-    trig = TimedRelayTrigger("rabbit", ws, 3, RABBIT_TRIGGER_PIN, RABBIT_RELAY_PIN, 5, trainio.SOUND_SSSH)
+    #trig = WigWagRelayTrigger("possum", ws, 6, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 10, 1, .3, trainio.SOUND_CLICKING)
+    #trig = TimedRelayTrigger("rabbit", ws, 3, RABBIT_TRIGGER_PIN, RABBIT_RELAY_PIN, 5, trainio.SOUND_SSSH)
 
-    eq.push(Event(time.time() + 1, lambda : setPinState(trainio.PIN_ON)))
-    eq.push(Event(time.time() + 4, lambda : setPinState(trainio.PIN_OFF)))
-    eq.push(Event(time.time() + 3, lambda : setRabbitPin(trainio.PIN_ON)))
-    eq.push(Event(time.time() + 4, lambda : setRabbitPin(trainio.PIN_OFF)))
-    eq.push(Event(time.time() + 5, lambda : setRabbitPin(trainio.PIN_ON)))
-    eq.push(Event(time.time() + 6, lambda : setRabbitPin(trainio.PIN_OFF)))
-    eq.push(Event(time.time() + 12, lambda : setRabbitPin(trainio.PIN_ON)))
-    eq.push(Event(time.time() + 15, lambda : setRabbitPin(trainio.PIN_OFF)))
-
-    eq.push(Event(time.time() + 14, lambda : setPinState(trainio.PIN_ON)))
+    #eq.push(Event(time.time() + 1, lambda : setPinState(trainio.PIN_ON)))
+    #eq.push(Event(time.time() + 4, lambda : setPinState(trainio.PIN_OFF)))
     total_ticks=0
     while(True):
+        time.sleep(TICK_TIME)
         logging.debug("Running tick " + str(total_ticks))
         total_ticks+=1
-        time.sleep(TICK_TIME)
         ws.scan_inputs()
         next_event = eq.peek()
         while(next_event and next_event.next_trigger_time <= time.time()):

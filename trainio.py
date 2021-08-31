@@ -1,4 +1,4 @@
-from playsound import playsound
+from train_sound_handler import SoundHandler
 import RPi.GPIO as GPIO
 import logging
 import time
@@ -36,6 +36,12 @@ NUM_BITS =40
 
 # Number of input bits via parallel to parallel 16 bit multiplexer
 NUM_MULTI_INPUT_PINS = 16
+
+# number of virtual sound channels (i.e. relays that control where left speaker channel goes to)
+NUM_VIRTUAL_SOUND_CHANNELS = 8
+
+# The starting index of output pins that defines where the virtual sound channels start from
+VIRTUAL_SOUND_CHANNEL_OFFSET = 32
 
 # Assumes that the SEL0-4 pins are used to control a parallel multiplexer board that selects from 16 different possible inputs
 def writeInputSelect(val):
@@ -75,10 +81,54 @@ def writeSerBit(bit):
     GPIO.output(SRCLK, GPIO.HIGH)
     time.sleep(CLOCK)
 
+# Main io class. This also implements the train_sound_handler virtual_sound_channel_mgr interface so that it can make
+# callbacks to this to enable and disable virtual sound channels
 class TrainIo():
     def __init__(self):
         self.virtual_output_pin_state = 0b00000000
         self.virtual_sound_channel_state = 0b00000000
+        self.sound_handler = SoundHandler(this)
+
+    def read_input_pin_state(self, pin):
+        return readInputBit(pin)
+    
+    def write_output_pin_state(self, virtual_pin_index, state):
+        logging.debug("setting output pin state for index:" + str(virtual_pin_index) + " to state " + str(state))
+        assert virtual_pin_index >= 0 and virtual_pin_index <= NUM_BITS
+        assert state >= PIN_OFF and state <= PIN_ON
+
+        res = self.virtual_output_pin_state
+        if(state == 1):
+            res = res | (1 << virtual_pin_index)
+        else:
+            res = res & ~(1 << virtual_pin_index)
+        self.virtual_output_pin_state = res
+        logging.debug("updated virtual output pins:" + bin(self.virtual_output_pin_state))
+        writeSerialData(self.virtual_output_pin_state)
+    
+    def get_all_input_pins(self):
+        return range(0, NUM_MULTI_INPUT_PINS)
+
+    def play_sound(self, name, virtual_channel):
+        self.sound_handler.play_sound(name, virtual_channel)
+
+    def print_state(self):
+        print("virtualPins:" + bin(self.virtual_output_pin_state))
+        print("virtual_channel:" + self.virtual_sound_channel)
+
+    # Implement virtual sound channel manager interface
+
+    def enable_virtual_channel(self, val):
+        self.write_output_pin_state(VIRTUAL_SOUND_CHANNEL_OFFSET + val, PIN_ON)
+
+    def disable_virtual_channel(self, val):
+        self.write_output_pin_state(VIRTUAL_SOUND_CHANNEL_OFFSET + val, PIN_OFF)
+
+    def num_channels(self):
+        # Note this will be invoked from the ctor so be careful not to reference undefined vars
+        return NUM_VIRTUAL_SOUND_CHANNELS
+
+    # end implement interface
 
     def performTest(self):
         for i in range(NUM_BITS):
@@ -95,15 +145,13 @@ class TrainIo():
             time.sleep(.5)
             
         time.sleep(2)
-        # Go through the upper 8 pins and turn them on
+        # Go through the virtual sound channels and play them
         for i in range(8):
-            self.write_output_pin_state(i + 32, PIN_ON)
-            time.sleep(.5)
-            
-        # Go through the upper 8 pins and turn them off
-        for i in range(8):
-            self.write_output_pin_state(i + 32, PIN_OFF)
-            time.sleep(.5)
+            self.play_sound("test", i)
+            time.sleep(1)
+        time.sleep(1)
+        self.play_sound("test", None)
+        time.sleep(1)
 
         time.sleep(2)
         # Read the first 8 inputs and pipe the result into the output pins
@@ -122,37 +170,6 @@ class TrainIo():
             self.write_output_pin_state(0, PIN_OFF)
             self.write_output_pin_state(7, PIN_OFF)
             time.sleep(.25)
-
-    
-    def read_input_pin_state(self, pin):
-        return readInputBit(pin)
-    
-    def write_output_pin_state(self, virtual_pin_index, state):
-        assert virtual_pin_index >= 0 and virtual_pin_index <= NUM_BITS
-        assert state >= PIN_OFF and state <= PIN_ON
-
-        res = self.virtual_output_pin_state
-        if(state == 1):
-            res = res | (1 << virtual_pin_index)
-        else:
-            res = res & ~(1 << virtual_pin_index)
-        self.virtual_output_pin_state = res
-        logging.debug("updated virtual output pins:" + bin(self.virtual_output_pin_state))
-        writeSerialData(self.virtual_output_pin_state)
-    
-    def get_all_input_pins(self):
-        return range(0, NUM_MULTI_INPUT_PINS)
-
-    def set_virtual_sound_channel(self, virtual_channel):
-        self.virtual_sound_channel = virtual_channel
-
-    def play_sound(self, filename):
-        if(filename != None):
-            playsound(filename, False)
-
-    def print_state(self):
-        print("virtualPins:" + bin(self.virtual_output_pin_state))
-        print("virtual_channel:" + self.virtual_sound_channel)
 
 def main():
     func_type = sys.argv[1]

@@ -10,6 +10,7 @@ from trainsound import Sound
 # logging.basicConfig(level=logging.DEBUG)
 # Globally define the sound names to Sound object mappings
 ALL_SOUNDS = {
+    "test": Sound("sounds/test"),
     "tmp1": Sound("sounds/tmp1"),
     "tmp2": Sound("sounds/tmp2")
 }
