@@ -87,7 +87,7 @@ class TrainIo():
     def __init__(self):
         self.virtual_output_pin_state = 0b00000000
         self.virtual_sound_channel_state = 0b00000000
-        self.sound_handler = SoundHandler(this)
+        self.sound_handler = SoundHandler(self)
 
     def read_input_pin_state(self, pin):
         return readInputBit(pin)
@@ -183,7 +183,7 @@ def main():
         print("Performing main test")
         v = TrainIo()
         v.performTest()
-        print("Testing complete)
+        print("Testing complete")
     elif(func_type == "output_test"):
         output_pin_index = int(sys.argv[1])
         assert output_pin_index >= 0 and output_pin_index <= NUM_BITS
