@@ -204,7 +204,7 @@ def main():
         time.sleep(2)
         v.write_output_pin_state(output_pin_index, PIN_OFF)
     elif(func_type == "input_test"):
-        input_pin_index = int(sys.argv[1])
+        input_pin_index = int(sys.argv[2])
         assert input_pin_index >= 0 and input_pin_index <= NUM_MULTI_INPUT_PINS
         v = TrainIo()
         val = v.read_input_pin_state(input_pin_index)

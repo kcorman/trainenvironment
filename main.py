@@ -5,12 +5,15 @@ import trainio
 
 TICK_TIME = 0.1
 
+BAT_TRIGGER_PIN = 0
+BAT_RELAY_PIN = 0
+
 POSSUM_RELAY_PIN = 0
 RABBIT_RELAY_PIN = 1
 POSSUM_TRIGGER_PIN = 0
 RABBIT_TRIGGER_PIN = 1
 
-logging.basicConfig(filename='app.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 class Event:
     def __init__(self, next_trigger_time, action):
@@ -153,7 +156,7 @@ def main():
     io = trainio.TrainIo()
     eq = EventQueue()
     ws = WorldState(eq, io)
-    #trig = TimedRelayTrigger("possum", ws, 3.5, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 5)
+    trig = TimedRelayTrigger("bats", ws, 10, BAT_TRIGGER_PIN, BAT_RELAY_PIN, 5, "cave_bats")
     #trig = WigWagRelayTrigger("possum", ws, 6, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 10, 1, .3, trainio.SOUND_CLICKING)
     #trig = TimedRelayTrigger("rabbit", ws, 3, RABBIT_TRIGGER_PIN, RABBIT_RELAY_PIN, 5, trainio.SOUND_SSSH)
 

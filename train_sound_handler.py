@@ -15,6 +15,7 @@ ALL_SOUNDS = {
     "test_right": Sound("sounds/test_right"),
     "tmp1": Sound("sounds/tmp1"),
     "tmp2": Sound("sounds/tmp2")
+    "cave_bats": Sound("sounds/cave_bats")
 }
 
 class SoundHandler():
