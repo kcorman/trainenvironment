@@ -11,6 +11,8 @@ from trainsound import Sound
 # Globally define the sound names to Sound object mappings
 ALL_SOUNDS = {
     "test": Sound("sounds/test"),
+    "test_left": Sound("sounds/test_left"),
+    "test_right": Sound("sounds/test_right"),
     "tmp1": Sound("sounds/tmp1"),
     "tmp2": Sound("sounds/tmp2")
 }

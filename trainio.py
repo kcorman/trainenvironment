@@ -64,6 +64,8 @@ def readInputBit(pin_num):
 
 # Writes serial data of length NUM_BITS to the SER pin
 def writeSerialData(val):
+    # I accidentally bought all LOW_TRIGGER relays, so invert everything and keep the logic the same
+    val = ~val
     GPIO.output(RCLK, GPIO.LOW)
     for i in range(0, NUM_BITS):
         bit = (val >> (NUM_BITS - 1 - i)) & 1
@@ -88,11 +90,16 @@ class TrainIo():
         self.virtual_output_pin_state = 0b00000000
         self.virtual_sound_channel_state = 0b00000000
         self.sound_handler = SoundHandler(self)
+        # Turn all output bits off
+        for i in range(NUM_BITS):
+            self.__setup_output_pin_state(i, PIN_OFF)
+        writeSerialData(self.virtual_output_pin_state)
 
     def read_input_pin_state(self, pin):
         return readInputBit(pin)
     
-    def write_output_pin_state(self, virtual_pin_index, state):
+    # sets output pin state without actually writing the data
+    def __setup_output_pin_state(self, virtual_pin_index, state):
         logging.debug("setting output pin state for index:" + str(virtual_pin_index) + " to state " + str(state))
         assert virtual_pin_index >= 0 and virtual_pin_index <= NUM_BITS
         assert state >= PIN_OFF and state <= PIN_ON
@@ -104,6 +111,9 @@ class TrainIo():
             res = res & ~(1 << virtual_pin_index)
         self.virtual_output_pin_state = res
         logging.debug("updated virtual output pins:" + bin(self.virtual_output_pin_state))
+
+    def write_output_pin_state(self, virtual_pin_index, state):
+        self.__setup_output_pin_state(virtual_pin_index, state)
         writeSerialData(self.virtual_output_pin_state)
     
     def get_all_input_pins(self):
@@ -150,11 +160,11 @@ class TrainIo():
         # Go through the virtual sound channels and play them
         print("Loop through output sound channels 0 through 8")
         for i in range(8):
-            self.play_sound("test", i)
+            self.play_sound("test_right", i)
             time.sleep(1)
         time.sleep(1)
         print("Play no-channel sound")
-        self.play_sound("test", None)
+        self.play_sound("test_left", None)
         time.sleep(1)
 
         time.sleep(2)
@@ -199,6 +209,13 @@ def main():
         v = TrainIo()
         val = v.read_input_pin_state(input_pin_index)
         print("read value: " + str(val) + " from input pin " + str(input_pin_index))
+    elif(func_type == "sound"):
+        sound_name = sys.argv[2]
+        ch = int(sys.argv[3])
+        v = TrainIo()
+        while(True):
+            v.play_sound(sound_name, ch)
+            time.sleep(2)
 
 
 if __name__ == "__main__":
