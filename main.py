@@ -7,6 +7,7 @@ TICK_TIME = 0.1
 
 BAT_TRIGGER_PIN = 0
 BAT_RELAY_PIN = 0
+SALOON_TRIGGER_PIN = 0
 
 POSSUM_RELAY_PIN = 0
 RABBIT_RELAY_PIN = 1
@@ -90,7 +91,7 @@ class Trigger:
             self.on = True
             self.trigger_impl()
             self.cooloff = time.time() + self.cooldown_duration
-            if(sound_name != None):
+            if(self.sound_name != None):
                 self.worldstate.io.play_sound(self.sound_name, self.sound_channel)
     
     def trigger_impl(self):
@@ -107,8 +108,8 @@ class Trigger:
         self.worldstate.subscribe_to_state_change(pin_index, self.fire_trigger)
 
 class TimedRelayTrigger(Trigger):
-    def __init__(self, name, worldstate, duration, trigger_pin, drive_pin, cooldown_duration, sound):
-        super(TimedRelayTrigger, self).__init__(name, worldstate, cooldown_duration, trigger_pin, sound)
+    def __init__(self, name, worldstate, duration, trigger_pin, drive_pin, cooldown_duration, sound, sound_channel):
+        super(TimedRelayTrigger, self).__init__(name, worldstate, cooldown_duration, trigger_pin, sound, sound_channel)
         self.duration = duration
         self.drive_pin = drive_pin
 
@@ -156,7 +157,8 @@ def main():
     io = trainio.TrainIo()
     eq = EventQueue()
     ws = WorldState(eq, io)
-    trig = TimedRelayTrigger("bats", ws, 10, BAT_TRIGGER_PIN, BAT_RELAY_PIN, 5, "cave_bats")
+    trig = TimedRelayTrigger("bats", ws, 20, BAT_TRIGGER_PIN, BAT_RELAY_PIN, 5, None, None)
+    trig = Trigger("saloon_music", ws, 20, SALOON_TRIGGER_PIN, "saloon", None)
     #trig = WigWagRelayTrigger("possum", ws, 6, POSSUM_TRIGGER_PIN, POSSUM_RELAY_PIN, 10, 1, .3, trainio.SOUND_CLICKING)
     #trig = TimedRelayTrigger("rabbit", ws, 3, RABBIT_TRIGGER_PIN, RABBIT_RELAY_PIN, 5, trainio.SOUND_SSSH)
 

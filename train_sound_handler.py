@@ -14,8 +14,9 @@ ALL_SOUNDS = {
     "test_left": Sound("sounds/test_left"),
     "test_right": Sound("sounds/test_right"),
     "tmp1": Sound("sounds/tmp1"),
-    "tmp2": Sound("sounds/tmp2")
-    "cave_bats": Sound("sounds/cave_bats")
+    "tmp2": Sound("sounds/tmp2"),
+    #"cave_bats": Sound("sounds/cave_bats"),
+    "saloon": Sound("sounds/saloon")
 }
 
 class SoundHandler():
