@@ -35,7 +35,7 @@ GPIO.setup(MULTI_INPUT, GPIO.IN)
 NUM_BITS =40
 
 # Number of input bits via parallel to parallel 16 bit multiplexer
-NUM_MULTI_INPUT_PINS = 16
+NUM_MULTI_INPUT_PINS = 3
 
 # number of virtual sound channels (i.e. relays that control where left speaker channel goes to)
 NUM_VIRTUAL_SOUND_CHANNELS = 8
