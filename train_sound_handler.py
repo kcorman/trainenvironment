@@ -48,26 +48,28 @@ class SoundHandler():
                 if(len(active_channel_list) == 0):
                     # means we did have elements but now we don't
                     self.virtual_sound_channel_mgr.disable_virtual_channel(i)
-                    logging.debug("Disabling virtual sound channel " + str(i) + " because all sounds completed on it")
+                    print("Disabling virtual sound channel " + str(i) + " because all sounds completed on it")
                 else:
                     res.append(i)
         return res
                 
 
     def play_sound(self, name, virtual_channel):
+        print("play sound: " + name)
         active_channels=self.cleanup_channels()
         if(not name in ALL_SOUNDS):
-            logging.warning("Asked to play sound that doesn't exist in known sounds: " + name)
+            print("Asked to play sound that doesn't exist in known sounds: " + name)
             return
         sound = ALL_SOUNDS[name]
         if(virtual_channel == None):
+            print("Playing sound on no virtual channel")
             sound.play_next_sound()
         else:
             if(len(active_channels) > 0):
-                logging.warning("Playing sound on channel " + str(virtual_channel) + " but found sounds already in progress on channels " + str(active_channels))
+                print("Playing sound on channel " + str(virtual_channel) + " but found sounds already in progress on channels " + str(active_channels))
             self.virtual_sound_channel_mgr.enable_virtual_channel(virtual_channel)
             sound.play_next_sound()
-            logging.debug("adding sound " + name + " to active virtual channel " + str(virtual_channel))
+            print("adding sound " + name + " to active virtual channel " + str(virtual_channel))
             self.active_channels[virtual_channel].append(sound)
             
 
@@ -83,20 +85,20 @@ if __name__ == "__main__":
 
     # test out sounds in tmp
     handler = SoundHandler(ChannelMgr())
-    #logging.debug("Play sound tmp1 on channel 3")
+    #print("Play sound tmp1 on channel 3")
     #handler.play_sound("tmp1", 3)
     #time.sleep(13)
-    #logging.debug("Play sound tmp1 on channel 3")
+    #print("Play sound tmp1 on channel 3")
     #handler.play_sound("tmp1", 3)
     #time.sleep(2)
-    #logging.debug("Play sound tmp2 on channel 5")
+    #print("Play sound tmp2 on channel 5")
     #handler.play_sound("tmp2", 5)
     #time.sleep(20)
-    #logging.debug("Play sound tmp2 on channel 5")
+    #print("Play sound tmp2 on channel 5")
     #handler.play_sound("tmp2", 1)
     #time.sleep(10)
-    logging.debug("Play sound tmp2 on no channel")
+    print("Play sound tmp2 on no channel")
     handler.play_sound("tmp2", None)
     time.sleep(10)
-    logging.debug("done")
+    print("done")
 

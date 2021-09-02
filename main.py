@@ -87,14 +87,13 @@ class Trigger:
         self.subscribe_to_pin_state(trigger_pin)
     
     def fire_trigger(self):
-        logger.debug("Trigger invoked for trigger " + self.name)
+        print("Trigger invoked for trigger " + self.name)
         if(self.worldstate.get_current_pin_state(self.trigger_pin) == trainio.PIN_ON and not self.on and time.time() >= self.cooloff):
-            self.on = True
-            logger.debug("Trigger running for trigger " + self.name)
+            print("Trigger running for trigger " + self.name)
             self.trigger_impl()
             self.cooloff = time.time() + self.cooldown_duration
             if(self.sound_name != None):
-                logger.debug("Trigger playing sound for trigger " + self.name)
+                print("Trigger playing sound for trigger " + self.name)
                 self.worldstate.io.play_sound(self.sound_name, self.sound_channel)
     
     def trigger_impl(self):
@@ -118,6 +117,7 @@ class TimedRelayTrigger(Trigger):
 
     def start(self):
         self.worldstate.write_pin_state(self.drive_pin, trainio.PIN_ON)
+        self.on = True
 
     def end_impl(self):
         self.worldstate.write_pin_state(self.drive_pin, trainio.PIN_OFF)

@@ -170,7 +170,7 @@ class TrainIo():
         time.sleep(2)
         # Read the first 8 inputs and pipe the result into the output pins
         print("Loop through inputs 0 through 8 and pipe result into output pins 0 through 8")
-        for i in range(8):
+        for i in range(NUM_MULTI_INPUT_PINS):
             val = self.read_input_pin_state(i)
             self.write_output_pin_state(i, val)
             time.sleep(1)

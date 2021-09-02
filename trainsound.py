@@ -17,9 +17,9 @@ class Sound:
     def update_known_files(self):
         self.files = [f for f in listdir(self.dirname) if isfile(join(self.dirname, f))]
         if(len(self.files) < 1):
-            logging.warn("sound with dir " + self.dirname + " has no files found in the directory")
+            print("sound with dir " + self.dirname + " has no files found in the directory")
         else:
-            logging.debug("sound with dir " + self.dirname + " found files " + str(self.files))
+            print("sound with dir " + self.dirname + " found files " + str(self.files))
         self.file_index = random.randrange(len(self.files))
 
     def num_files(self):
@@ -38,8 +38,9 @@ class Sound:
 
     def play_next_sound(self):
         if(self.is_playing()):
-            logging.warn("play_next_sound invoked for sound " + self.dirname + " but sound is already in progress")
+            print("play_next_sound invoked for sound " + self.dirname + " but sound is already in progress")
         else:
+            print("Going to play next sound since none is in progress for sound " + self.dirname)
             f = self.next_file()
             self.curr_sound_handle = simple_sound_lib.play_sound(join(self.dirname, f))
 
