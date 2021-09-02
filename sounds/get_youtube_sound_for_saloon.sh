@@ -1,2 +1,1 @@
-youtube-dl -x --audio-format mp3 --output "$2" $1
-sh convert_to_left_only.sh $2
+youtube-dl -x --audio-format mp3 --output "%(uploader)s%(title)s.%(ext)s" $1 --exec "sh convert_for_saloon.sh {}"
